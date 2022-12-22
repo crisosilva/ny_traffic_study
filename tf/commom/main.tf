@@ -90,4 +90,4 @@ resource "azurerm_network_security_group" "allow_ssh" {
     destination_address_prefix = "*"
   }
 }
-Footer
+
