@@ -20,16 +20,16 @@ terraform {
 # VARIABLES
 ###########################
 
-variable "region" {
+variable "rg_location" {
   type        = string
-  description = "Region in Azure"
   default     = "eastus"
+  description = "Location of the resource group."
 }
 
-variable "prefix" {
+variable "rg_name_prefix" {
   type        = string
-  description = "prefix for naming"
-  default     = "tacos"
+  default     = "rg"
+  description = "Prefix ofthe resource group name that's combined with a random ID so name is unique in your Azure subscription."
 }
 
 ###########################
@@ -45,12 +45,24 @@ provider "azurerm" {
 ###########################
 
 locals {
-  name = "${var.prefix}-${random_id.seed.hex}"
+  #name = "${var.prefix}-${random_id.seed.hex}"
+  name = "${var.rg_name_prefix}-${random_id.seed.hex}"
 }
 
 ###########################
 # RESOURCES
 ###########################
+
+#Resource group creation
+resource "azurerm_resource_group" "rg_ny_traffic_study" {
+  prefix = var.rg_name_prefix
+}
+
+resource "azurerm_resource_group" "rg_ny_traffic_study" {
+  location = var.rg_location
+  name     = azurerm_resource_group.rg_ny_traffic_study.id
+}
+########
 
 resource "random_id" "seed" {
   byte_length = 4
