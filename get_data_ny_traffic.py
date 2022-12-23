@@ -1,11 +1,3 @@
-
-
-url = 'https://data.cityofnewyork.us/resource/9n6h-pt9g.json' #dados redutores de velocidade
-url2 = 'https://data.cityofnewyork.us/resource/h9gi-nx95.json' #dados de colisão de veiculos
-
-
-
-
 from datetime import datetime
 
 from airflow import DAG
@@ -17,11 +9,17 @@ from time import sleep
 
 SRC = "https://"
 
+url = 'https://data.cityofnewyork.us/resource/9n6h-pt9g.json' #dados redutores de velocidade
+url2 = 'https://data.cityofnewyork.us/resource/h9gi-nx95.json' #dados de colisão de veiculos
+
+
+
 ##########################################################
 
 @dag(start_date=now, schedule="@daily", catchup=False)
 def etl():
-    @task():
+    
+    @task()
     def retrieve(src:Dataset) -> dict:
         resp = requests.get(url=src.uri)
         data = resp.json()
