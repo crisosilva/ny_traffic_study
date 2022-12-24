@@ -27,7 +27,7 @@ stages:
       displayName: Docker login
     - script:
         docker build -t airflow_cris:latest
-      displayName: Building the image
+      displayName: Building image
     - script:
         docker push crisosilva88/airflow_cris:latest
-      displayName: Push the image to DockerHub
+      displayName: Push image to DockerHub
