@@ -1,0 +1,64 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+variables:
+  vmImageName: 'ubuntu-latest'
+  terraformVersion: 0.12.3
+  azureSubscriptionServiceConnectionName: 
+  tfStateResourceGroupName:
+  tfStateAzureStorageAccountSku: 
+  tfStateAzureStorageAccountName: 
+  tfStateContainerName: 
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+#- script: 
+#    terraform init
+#    terraform apply -auto-approve
+#  displayName: 'Terraform init, plan and apply
+
+- script: 
+    docker login --username=crisosilva88 --email=crisosilva88@gmail.com
+    docker build -t airflow_cris:latest
+    docker push crisosilva88/airflow_cris:latest
+
+- task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-installer.TerraformInstaller@0
+  displayName: 'Use Terraform $(terraformVersion)'
+  inputs:
+    terraformVersion: $(terraformVersion)
+
+- task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
+  displayName: 'terraform init'
+  inputs:
+    command: init
+    workingDirectory: '$(System.DefaultWorkingDirectory)/tf'
+    backendType: azurerm
+    backendServiceArm: $(azureSubscriptionServiceConnectionName)
+    ensureBackend: true
+    backendAzureRmResourceGroupLocation: $(location)
+    backendAzureRmResourceGroupName: $(tfStateResourceGroupName)
+    backendAzureRmStorageAccountName: $(tfStateAzureStorageAccountName)
+    backendAzureRmStorageAccountSku: $(tfStateAzureStorageAccountSku)
+    backendAzureRmContainerName: $(tfStateContainerName)
+    backendAzureRmKey: 'common.tfstate'
+- task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
+  displayName: 'terraform validate'
+  inputs:
+    workingDirectory: '$(System.DefaultWorkingDirectory)/tf'
+- task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
+  displayName: 'terraform apply'
+  inputs:
+    command: apply
+    workingDirectory: '$(System.DefaultWorkingDirectory)/tf'
+    environmentServiceName: $(azureSubscriptionServiceConnectionName)
+    commandOptions: '-auto-approve -var location=$(location) -var tenant_id=$(tenantId)'
