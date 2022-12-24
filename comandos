@@ -1,0 +1,6 @@
+docker run -it -p 8080:8080 \
+  --env "_PIP_ADDITIONAL_REQUIREMENTS=lxml==4.6.3 charset-normalizer==1.4.1" \
+  --env "_AIRFLOW_DB_UPGRADE=true" \
+  --env "_AIRFLOW_WWW_USER_CREATE=true" \
+  --env "_AIRFLOW_WWW_USER_PASSWORD_CMD=echo admin" \
+    apache/airflow:2.5.0-python3.8 webserver
