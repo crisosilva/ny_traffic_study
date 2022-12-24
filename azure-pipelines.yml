@@ -26,5 +26,10 @@ steps:
 
 - script: 
     docker login --username=crisosilva88 --email=crisosilva88@gmail.com
+  displayName: Docker login
+- script:
     docker build -t airflow_cris:latest
+  displayName: Building the image
+- script:
     docker push crisosilva88/airflow_cris:latest
+  displayName: Push the image to DockerHub
